@@ -6,26 +6,22 @@ public class EnemySpawner : MonoBehaviour
 {
     [SerializeField]
     private GameObject enemy;
+    public GameObject player;
 
     private float enemyInterval = 5f;
-
-    public Transform[] m_SpawnPoints;
 
     // Start is called before the first frame update
     void Start()
     {
+        // fill m_SpawnPoints with random transform.positions 
         StartCoroutine(spawnEnemy(enemyInterval, enemy));
-
     }
 
     private IEnumerator spawnEnemy(float interval, GameObject enemy)
     {
-        int randomNumber = Mathf.RoundToInt(Random.Range(0f, m_SpawnPoints.Length - 1));
         yield return new WaitForSeconds(interval);
-        GameObject newEnemy = Instantiate(enemy, m_SpawnPoints[randomNumber].transform.position, Quaternion.identity);
+        GameObject newEnemy = Instantiate(enemy, new Vector3(Random.Range(-10f, 10f), 1.7f, Random.Range(-10f, 10f)), Quaternion.identity);
+        newEnemy.transform.LookAt(player.transform);
         StartCoroutine(spawnEnemy(interval, enemy));
-
-
-
     }
 }
