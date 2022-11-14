@@ -8,7 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/StartMenu.unity
     guid: adef4b674f3215d4498064ccad55fe69
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DefaultArena.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/EnemySpawn.unity
+    guid: b10355511050a7e478eb649829874cdf
   m_configObjects: {}
