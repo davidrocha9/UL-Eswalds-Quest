@@ -25,12 +25,31 @@ public class Enemy : MonoBehaviour
     void Update()
     {
         Chase();
+        Physics.IgnoreCollision(player.GetComponent<Collider>(), GetComponent<Collider>());
     }
 
     private void Chase()
     {
-        //look at player
+        // rotate on y axis to face player without rotating on x and z axis
         transform.LookAt(player.transform.position);
-        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+
+        Debug.Log(Vector3.Distance(transform.position, player.transform.position));
+
+        // if distance between player and enemy is greater than 1 and doesnt collide with other enemies with spherecast, move towards player
+        if (Vector3.Distance(transform.position, player.transform.position) > 1 && !Physics.Raycast(transform.position, transform.forward, 1))
+        {
+            transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        }
+    }
+
+    // ignore collision with player
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            Debug.Log("colisao");
+            Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
+        }
     }
 }
