@@ -40,8 +40,8 @@ public class Enemy : MonoBehaviour
 
     private void Chase()
     {
+        //look at player
+        transform.LookAt(player.transform.position);
         transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
     }
-
-    
 }
