@@ -5,10 +5,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
 
-    [SerializeField]
-    private int damage = 5;
-    [SerializeField]
-    private float speed = 1.5f; 
+
 
     [SerializeField]
     private EnemyData data;
@@ -18,23 +15,40 @@ public class Enemy : MonoBehaviour
 
 
 
+
+
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        GameManager.gameManager._enemyHealth.SetHealth(data.hp);
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        if(GameManager.gameManager._enemyHealth.Health == 0 || GameManager.gameManager._enemyHealth.Health < 0) {
+            Destroy(gameObject);
+        }
         if (other.tag == "FireBall")
         {
-            Destroy(gameObject);
+                EnemyTakeDmg(30);
+                if(GameManager.gameManager._enemyHealth.Health == 0 || GameManager.gameManager._enemyHealth.Health < 0) {
+                    Destroy(this.gameObject);
+                }
+                Debug.Log(GameManager.gameManager._enemyHealth.Health);
+        }else if (other.tag == "Sword")
+        {
+                EnemyTakeDmg(40);
+                if(GameManager.gameManager._enemyHealth.Health == 0 || GameManager.gameManager._enemyHealth.Health < 0) {
+                    Destroy(this.gameObject);
+                }
         }
     }
 
     // Update is called once per frame
     void Update()
     {
+
         Chase();
     }
 
@@ -42,6 +56,14 @@ public class Enemy : MonoBehaviour
     {
         //look at player
         transform.LookAt(player.transform.position);
-        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, data.speed * Time.deltaTime);
+
     }
+
+    private void EnemyTakeDmg(int dmg)
+    {
+        GameManager.gameManager._enemyHealth.DmgUnit(dmg);
+        Debug.Log(GameManager.gameManager._enemyHealth.Health);
+    }
+
 }
