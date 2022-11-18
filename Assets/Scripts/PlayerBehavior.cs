@@ -9,7 +9,8 @@ public class PlayerBehavior : MonoBehaviour
 {
 
     public Text textBox;
-
+    public Slider healthBar;
+    private bool tookDmg = false;
     void Start()
     {
 
@@ -32,8 +33,21 @@ public class PlayerBehavior : MonoBehaviour
 
     void Update()
     {
-
         textBox.text = "Health: " + GameManager.gameManager._playerHealth.Health;
+    }
+
+    void FixedUpdate()
+    {
+        if (tookDmg)
+        {
+            healthBar.value = healthBar.value - 0.01f;
+            Debug.Log(healthBar.value);
+            Debug.Log(GameManager.gameManager._playerHealth.Health);
+            if (healthBar.value * 100.0f <= GameManager.gameManager._playerHealth.Health)
+            {
+                tookDmg = false;
+            }
+        }
     }
 
     // Methods
@@ -42,6 +56,7 @@ public class PlayerBehavior : MonoBehaviour
     {
         GameManager.gameManager._playerHealth.DmgUnit(dmg);
         Debug.Log(GameManager.gameManager._playerHealth.Health);
+        tookDmg = true;
     }
 
     private void PlayerHeal(int healing)
