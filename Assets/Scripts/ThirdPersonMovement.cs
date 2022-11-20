@@ -38,10 +38,13 @@ using System.Collections;
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Threading;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
@@ -57,7 +60,13 @@ public class ThirdPersonMovement : MonoBehaviour
 
     float turnSmoothVelocity;
     public float turnSmoothTime = 0.1f;
-    
+
+    // Player run & stamina stuff
+    private float runSpeed = 10;
+    private float normalSpeed = 6;
+    private float runStamina = 100f;
+    private float maxStamina = 100f;
+    [SerializeField] private Slider staminaSlider;
 
     // Update is called once per frame
     void Update()
@@ -68,6 +77,29 @@ public class ThirdPersonMovement : MonoBehaviour
         }
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        // run control
+        if (Input.GetKey(KeyCode.LeftShift) && runStamina > 0)
+        {
+            speed = runSpeed;
+            print("Running and stamina: " + runStamina);
+
+            runStamina -= 15 * Time.deltaTime;
+            staminaSlider.value = runStamina;
+        }
+        else
+        {
+
+            speed = normalSpeed;
+            print("Not Running and stamina: " + runStamina);
+
+            if (runStamina < maxStamina)
+            {
+                runStamina += 3 * Time.deltaTime;
+                staminaSlider.value = runStamina;
+            }
+
+        }
     }
 
     void FixedUpdate(){
