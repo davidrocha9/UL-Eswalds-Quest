@@ -62,10 +62,8 @@ public class ThirdPersonMovement : MonoBehaviour
     public float turnSmoothTime = 0.1f;
 
     // Player run & stamina stuff
-    private float runSpeed = 10;
+    private float runSpeed = 12;
     private float normalSpeed = 6;
-    private float runStamina = 100f;
-    private float maxStamina = 100f;
     [SerializeField] private Slider staminaSlider;
 
     // Update is called once per frame
@@ -77,26 +75,26 @@ public class ThirdPersonMovement : MonoBehaviour
         }
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
-
+        
         // run control
-        if (Input.GetKey(KeyCode.LeftShift) && runStamina > 0)
+        if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0)
         {
             speed = runSpeed;
-            print("Running and stamina: " + runStamina);
+            print("Running and stamina: " + GameManager.gameManager._playerStamina.Stamina);
 
-            runStamina -= 15 * Time.deltaTime;
-            staminaSlider.value = runStamina;
+            GameManager.gameManager._playerStamina.Stamina -= GameManager.gameManager._playerStamina.UseAmount * Time.deltaTime;
+            staminaSlider.value = GameManager.gameManager._playerStamina.Stamina;
         }
         else
         {
 
             speed = normalSpeed;
-            print("Not Running and stamina: " + runStamina);
+            print("Not Running and stamina: " + GameManager.gameManager._playerStamina.Stamina);
 
-            if (runStamina < maxStamina)
+            if (GameManager.gameManager._playerStamina.Stamina < GameManager.gameManager._playerStamina.MaxStamina)
             {
-                runStamina += 3 * Time.deltaTime;
-                staminaSlider.value = runStamina;
+                GameManager.gameManager._playerStamina.Stamina += GameManager.gameManager._playerStamina.ReloadAmount * Time.deltaTime;
+                staminaSlider.value = GameManager.gameManager._playerStamina.Stamina;
             }
 
         }
