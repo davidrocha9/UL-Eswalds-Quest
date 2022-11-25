@@ -56,7 +56,6 @@ public class ThirdPersonMovement : MonoBehaviour
     public float jumpHeight = 1.5f;
     Vector3 velocity;
     Vector2 movementRcvd;
-    bool isGrounded;
 
     float turnSmoothVelocity;
     public float turnSmoothTime = 0.1f;
@@ -77,11 +76,10 @@ public class ThirdPersonMovement : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
         
         // run control
-        if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0)
+        if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && transform.position.y <= 1.6f)
         {
             speed = runSpeed;
-            print("Running and stamina: " + GameManager.gameManager._playerStamina.Stamina);
-
+           
             GameManager.gameManager._playerStamina.Stamina -= GameManager.gameManager._playerStamina.UseAmount * Time.deltaTime;
             staminaSlider.value = GameManager.gameManager._playerStamina.Stamina;
         }
@@ -89,8 +87,7 @@ public class ThirdPersonMovement : MonoBehaviour
         {
 
             speed = normalSpeed;
-            print("Not Running and stamina: " + GameManager.gameManager._playerStamina.Stamina);
-
+ 
             if (GameManager.gameManager._playerStamina.Stamina < GameManager.gameManager._playerStamina.MaxStamina)
             {
                 GameManager.gameManager._playerStamina.Stamina += GameManager.gameManager._playerStamina.ReloadAmount * Time.deltaTime;
