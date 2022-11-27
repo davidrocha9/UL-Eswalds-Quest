@@ -57,7 +57,15 @@ public class ThirdPersonMovement : MonoBehaviour
 
     float turnSmoothVelocity;
     public float turnSmoothTime = 0.1f;
-    
+
+    // sender
+    public delegate void PlayerWalking(bool isWalking);
+    public static event PlayerWalking PlayerWalkingInfo;
+
+    void Start()
+    {
+        
+    }
 
     // Update is called once per frame
     void Update()
@@ -71,10 +79,15 @@ public class ThirdPersonMovement : MonoBehaviour
     }
 
     void FixedUpdate(){
-        MovePlayer();
+        bool isWalking = MovePlayer();
+        if (PlayerWalkingInfo != null)
+        {
+            PlayerWalkingInfo(isWalking);
+        }
     }
 
-    void MovePlayer(){
+    bool MovePlayer(){
+        bool isWalking = false;
         Vector3 direction = new Vector3(movementRcvd.x, 0f, movementRcvd.y).normalized;
 
         if(direction.magnitude >= 0.1f)
@@ -85,7 +98,13 @@ public class ThirdPersonMovement : MonoBehaviour
 
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             controller.Move(moveDir.normalized * speed * Time.deltaTime);
+
+            
+            isWalking = true;
+
         }
+
+        return isWalking;
     }
 
     void OnMove(InputValue input){
@@ -98,4 +117,5 @@ public class ThirdPersonMovement : MonoBehaviour
             velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
         }
     }
+
 }
