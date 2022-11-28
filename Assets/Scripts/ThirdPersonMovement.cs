@@ -3,10 +3,13 @@ using System.Collections;
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Threading;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
@@ -18,11 +21,14 @@ public class ThirdPersonMovement : MonoBehaviour
     public float jumpHeight = 1.5f;
     Vector3 velocity;
     Vector2 movementRcvd;
-    bool isGrounded;
 
     float turnSmoothVelocity;
     public float turnSmoothTime = 0.1f;
 
+    // Player run & stamina stuff
+    private float runSpeed = 12;
+    private float normalSpeed = 6;
+    [SerializeField] private Slider staminaSlider;
     // sender
     public delegate void PlayerWalking(bool isWalking);
     public static event PlayerWalking PlayerActionInfo;
@@ -43,6 +49,28 @@ public class ThirdPersonMovement : MonoBehaviour
         }
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        // run control
+        if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && transform.position.y <= 1.6f)
+        {
+            speed = runSpeed;
+           
+            GameManager.gameManager._playerStamina.Stamina -= GameManager.gameManager._playerStamina.UseAmount * Time.deltaTime;
+            Debug.Log("Stamina: " + GameManager.gameManager._playerStamina.Stamina);
+            staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+        }
+        else
+        {
+
+            speed = normalSpeed;
+ 
+            if (GameManager.gameManager._playerStamina.Stamina < GameManager.gameManager._playerStamina.MaxStamina)
+            {
+                GameManager.gameManager._playerStamina.Stamina += GameManager.gameManager._playerStamina.ReloadAmount * Time.deltaTime;
+                staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+            }
+
+        }
     }
 
     void FixedUpdate(){
