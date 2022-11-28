@@ -1,38 +1,3 @@
-/*using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class ThirdPersonMovement : MonoBehaviour
-{
-    public CharacterController controller;
-    public float speed = 6f;
-    public float turnSmoothTime = 0.1f;
-    float turnSmoothVelocity;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
-        Debug.Log(direction);
-
-        if (direction.magnitude >= 0.1f)
-        {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);  
-            transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
-            controller.Move(direction*speed*Time.deltaTime);
-        }
-    }
-}*/
-
 using System.Collections;
 
 
@@ -64,6 +29,16 @@ public class ThirdPersonMovement : MonoBehaviour
     private float runSpeed = 12;
     private float normalSpeed = 6;
     [SerializeField] private Slider staminaSlider;
+    // sender
+    public delegate void PlayerWalking(bool isWalking);
+    public static event PlayerWalking PlayerActionInfo;
+    private Animator anim;
+
+    void Start()
+    {
+        // get animator from child
+        anim = GetComponentInChildren<Animator>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -74,14 +49,15 @@ public class ThirdPersonMovement : MonoBehaviour
         }
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
-        
+
         // run control
         if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && transform.position.y <= 1.6f)
         {
             speed = runSpeed;
            
             GameManager.gameManager._playerStamina.Stamina -= GameManager.gameManager._playerStamina.UseAmount * Time.deltaTime;
-            staminaSlider.value = GameManager.gameManager._playerStamina.Stamina;
+            Debug.Log("Stamina: " + GameManager.gameManager._playerStamina.Stamina);
+            staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
         }
         else
         {
@@ -91,17 +67,22 @@ public class ThirdPersonMovement : MonoBehaviour
             if (GameManager.gameManager._playerStamina.Stamina < GameManager.gameManager._playerStamina.MaxStamina)
             {
                 GameManager.gameManager._playerStamina.Stamina += GameManager.gameManager._playerStamina.ReloadAmount * Time.deltaTime;
-                staminaSlider.value = GameManager.gameManager._playerStamina.Stamina;
+                staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
             }
 
         }
     }
 
     void FixedUpdate(){
-        MovePlayer();
+        bool isWalking = MovePlayer();
+        if (PlayerActionInfo != null)
+        {
+            PlayerActionInfo(isWalking);
+        }
     }
 
-    void MovePlayer(){
+    bool MovePlayer(){
+        bool isWalking = false;
         Vector3 direction = new Vector3(movementRcvd.x, 0f, movementRcvd.y).normalized;
 
         if(direction.magnitude >= 0.1f)
@@ -112,7 +93,13 @@ public class ThirdPersonMovement : MonoBehaviour
 
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             controller.Move(moveDir.normalized * speed * Time.deltaTime);
+
+            
+            isWalking = true;
+
         }
+
+        return isWalking;
     }
 
     void OnMove(InputValue input){
@@ -123,6 +110,10 @@ public class ThirdPersonMovement : MonoBehaviour
         if (transform.position.y <= 1.6f)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
+
+            // set is_jumping to true on animator
+            anim.SetBool("is_jumping", true);
         }
     }
+
 }
