@@ -11,6 +11,7 @@ public class PlayerBehavior : MonoBehaviour
     public Text textBox;
     public Slider healthBar;
     private bool tookDmg = false;
+    private bool healed = false;
     void Start()
     {
 
@@ -48,6 +49,17 @@ public class PlayerBehavior : MonoBehaviour
                 tookDmg = false;
             }
         }
+
+
+        if(healed) {
+            healthBar.value = healthBar.value + 0.01f;
+            Debug.Log(healthBar.value);
+            Debug.Log(GameManager.gameManager._playerHealth.Health);
+            if (healthBar.value * 100.0f >= GameManager.gameManager._playerHealth.Health)
+            {
+                healed = false;
+            }
+        }
     }
 
     // Methods
@@ -62,5 +74,6 @@ public class PlayerBehavior : MonoBehaviour
     private void PlayerHeal(int healing)
     {
         GameManager.gameManager._playerHealth.HealUnit(healing);
+        healed = true;
     }
 }
