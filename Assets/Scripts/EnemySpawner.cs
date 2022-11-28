@@ -8,12 +8,12 @@ public class EnemySpawner : MonoBehaviour
     private GameObject enemy;
     public GameObject player;
 
-    private float enemyInterval = 1f;
+    private float enemyInterval = 3f;
 
     // Start is called before the first frame update
     void Start()
     {
-        // fill m_SpawnPoints with random transform.positions 
+        // fill m_SpawnPoints with random transform.positions
         StartCoroutine(spawnEnemy(enemyInterval, enemy));
     }
 

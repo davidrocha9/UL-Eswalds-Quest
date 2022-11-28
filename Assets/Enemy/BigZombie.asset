@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24f2fa942df7c4640b44495149bf1d9a, type: 3}
   m_Name: BigZombie
   m_EditorClassIdentifier: 
-  hp: 200
-  damage: 40
-  speed: 2
+  hp: 50
+  damage: 20
+  speed: 1
