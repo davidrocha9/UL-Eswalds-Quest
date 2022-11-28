@@ -8,7 +8,7 @@ public class EnemySpawner : MonoBehaviour
     private GameObject enemy;
     public GameObject player;
 
-    private float enemyInterval = 5f;
+    private float enemyInterval = 1f;
 
     // Start is called before the first frame update
     void Start()
