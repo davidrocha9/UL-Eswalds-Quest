@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - FireBall
+  - Sword
+  - EnemyWeapon
+  - HealthItem
+  - StaminaBar
   layers:
   - Default
   - TransparentFX
