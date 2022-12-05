@@ -20,7 +20,7 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        BossSlider = GameObject.Find("UI").GetComponent<Slider>();
+        //BossSlider = GameObject.Find("UI").GetComponent<Slider>();
         GameManager.gameManager._enemyHealth.SetHealth(data.hp);
     }
 
@@ -37,7 +37,6 @@ public class Enemy : MonoBehaviour
                     Destroy(this.gameObject);
                     BossSlider.gameObject.SetActive(false);
                 }
-                Debug.Log(GameManager.gameManager._enemyHealth.Health);
 
         }
         else if (other.tag == "Sword")
@@ -58,16 +57,12 @@ public class Enemy : MonoBehaviour
         {
             if(data.boss) {
                 BossSlider.value = BossSlider.value - 0.01f;
-                Debug.Log(BossSlider.value);
-                Debug.Log(GameManager.gameManager._enemyHealth.Health);
                 if (BossSlider.value * 100.0f <= GameManager.gameManager._enemyHealth.Health)
                 {
                     tookDmg = false;
                 }
             } else {
                 sliderUI.value = sliderUI.value - 0.01f;
-                Debug.Log(sliderUI.value);
-                Debug.Log(GameManager.gameManager._enemyHealth.Health);
                 if (sliderUI.value * 100.0f <= GameManager.gameManager._enemyHealth.Health)
                 {
                     tookDmg = false;
@@ -95,9 +90,6 @@ public class Enemy : MonoBehaviour
         // rotate on y axis to face player without rotating on x and z axis
         transform.LookAt(player.transform.position);
         transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
-
-        Debug.Log(Vector3.Distance(transform.position, player.transform.position));
-
         // if distance between player and enemy is greater than 1 and doesnt collide with other enemies with spherecast, move towards player
         if (Vector3.Distance(transform.position, player.transform.position) > 1)
         {
@@ -105,10 +97,9 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void EnemyTakeDmg(int dmg)
+    public void EnemyTakeDmg(int dmg)
     {
         GameManager.gameManager._enemyHealth.DmgUnit(dmg);
-        Debug.Log(GameManager.gameManager._enemyHealth.Health);
         tookDmg = true;
     }
 
