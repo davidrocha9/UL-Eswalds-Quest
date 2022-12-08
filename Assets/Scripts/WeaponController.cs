@@ -12,26 +12,7 @@ public class WeaponController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            if(CanAttack)
-            {
-                SwordAttack();
-            }
+            
         }
     }
-
-    public void SwordAttack()
-    {
-        CanAttack = false;
-        Animator anim = Sword.GetComponent<Animator>();
-        anim.SetTrigger("Attack");
-        StartCoroutine(ResetAttackCooldown());
-    }
-
-    IEnumerator ResetAttackCooldown()
-    {
-        yield return new WaitForSeconds(AttackCoolDown);
-        CanAttack = true;
-    }
-
-
 }
