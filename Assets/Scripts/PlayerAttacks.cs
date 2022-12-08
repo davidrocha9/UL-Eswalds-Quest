@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PlayerAttacks : MonoBehaviour
 {
@@ -8,10 +9,14 @@ public class PlayerAttacks : MonoBehaviour
     public Transform fireBallPoint;
     public float fireBallSpeed = 600;
     private float distance = 100.0f;
+    private bool thrown = false;
+    public TextMeshProUGUI bombCnt;
     public void FireBallAttack()
     {
         GameObject ball = Instantiate(fireBall, fireBallPoint.position, Quaternion.identity);
-        ball.GetComponent<Rigidbody>().AddForce(fireBallPoint.forward * fireBallSpeed);
+        // make ball rotation same as player
+        ball.transform.rotation = transform.rotation;
+        //ball.GetComponent<Rigidbody>().AddForce(fireBallPoint.forward * fireBallSpeed);
     }
 
     void Update()
@@ -22,9 +27,12 @@ public class PlayerAttacks : MonoBehaviour
         if (Physics.Raycast(ray, out hit, distance))
         {
 
-            if (Input.GetKeyDown(KeyCode.F))
+            if (Input.GetKeyDown(KeyCode.F) && int.Parse(bombCnt.text) > 0)
             {
                 FireBallAttack();
+
+                // change bombCnt to the value it had minus 1
+                bombCnt.text = (int.Parse(bombCnt.text) - 1).ToString();
             }
         }
     }

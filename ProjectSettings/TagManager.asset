@@ -10,6 +10,7 @@ TagManager:
   - EnemyWeapon
   - HealthItem
   - StaminaBar
+  - Explosion
   layers:
   - Default
   - TransparentFX
