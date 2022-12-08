@@ -31,6 +31,7 @@ public class ThirdPersonMovement : MonoBehaviour
     private float runSpeed = 10;
     private float walkSpeed = 6;
     [SerializeField] private Slider staminaSlider;
+    private bool isStaminaOut = false;
     
     // Animator variables
     private Animator anim;
@@ -57,7 +58,7 @@ public class ThirdPersonMovement : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
 
         // Movement Control
-        if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && is_grounded)
+        if (Input.GetKey(KeyCode.LeftShift) && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))  && GameManager.gameManager._playerStamina.Stamina > 0 && !isStaminaOut && is_grounded)
         {
             Run();
             UseStamina();
@@ -65,12 +66,27 @@ public class ThirdPersonMovement : MonoBehaviour
         else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) && is_grounded)
         {
             Walk();
-            ReloadStamina();
+            if (isStaminaOut)
+            {
+                FullWaitReloadStamina();
+            } 
+            else
+            {
+                ReloadStamina();
+            }
+            
         }
         else
         {
             Idle();
-            ReloadStamina();
+            if (isStaminaOut)
+            {
+                FullWaitReloadStamina();
+            }
+            else
+            {
+                ReloadStamina();
+            }
         }
 
         // if animation is not jumping, then set anim param to false
@@ -153,10 +169,25 @@ public class ThirdPersonMovement : MonoBehaviour
             staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
         }
     }
+
+    private void FullWaitReloadStamina()
+    {
+        GameManager.gameManager._playerStamina.Stamina += GameManager.gameManager._playerStamina.ReloadAmount * Time.deltaTime;
+        staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+        if (GameManager.gameManager._playerStamina.Stamina >= 25)
+        {
+            isStaminaOut = false;
+        }
+    }
     private void UseStamina()
     {
         GameManager.gameManager._playerStamina.Stamina -= GameManager.gameManager._playerStamina.UseAmount * Time.deltaTime;
         staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+
+        if (GameManager.gameManager._playerStamina.Stamina <= 0)
+        {
+            isStaminaOut = true;
+        }
     }
 
     // Collision
@@ -167,4 +198,5 @@ public class ThirdPersonMovement : MonoBehaviour
             is_grounded = true;
         }
     }
+
 }
