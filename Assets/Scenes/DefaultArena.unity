@@ -1038,10 +1038,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.4574955
+  m_Radius: 0.40851614
   m_Height: 2.0672233
   m_Direction: 1
-  m_Center: {x: 0.04250449, y: 0.9184929, z: 0}
+  m_Center: {x: -0.006474932, y: 0.918493, z: 0}
 --- !u!95 &535554245
 Animator:
   serializedVersion: 3
@@ -2407,7 +2407,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.33100694, y: 0.000000016236429, z: -0.0000000056954317, w: 0.9436283}
+  m_LocalRotation: {x: 0.33100694, y: -0.000000016236429, z: 0.0000000056954317, w: 0.9436283}
   m_LocalPosition: {x: -1.32, y: 11.77, z: -1.3400002}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -2574,6 +2574,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad7bb97cbc4940142be317fce6f65b48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controller: {fileID: 0}
   cam: {fileID: 963194228}
   speed: 6
   gravity: -9.81
@@ -4415,7 +4416,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1772203908}
-  m_LocalRotation: {x: 0.33100694, y: 0.000000016236429, z: -0.0000000056954317, w: 0.9436283}
+  m_LocalRotation: {x: 0.33100694, y: -0.000000016236429, z: 0.0000000056954317, w: 0.9436283}
   m_LocalPosition: {x: -1.32, y: 11.77, z: -1.3400002}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:

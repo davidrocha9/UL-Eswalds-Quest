@@ -20,6 +20,7 @@ public class ThirdPersonMovement : MonoBehaviour
     public float speed = 6;
     public float gravity = -9.81f;
     public float jumpHeight = 1.5f;
+    private bool is_grounded = false;
     Vector3 velocity;
     Vector2 movementRcvd;
 
@@ -34,6 +35,9 @@ public class ThirdPersonMovement : MonoBehaviour
     // Animator variables
     private Animator anim;
     private string JUMP_ANIMATION = "is_jumping";
+
+    // Object tags
+    private string MESH_TAG = "Mesh";
 
     void Start()
     {
@@ -53,12 +57,12 @@ public class ThirdPersonMovement : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
 
         // Movement Control
-        if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && transform.position.y <= 1.6f)
+        if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && is_grounded)
         {
             Run();
             UseStamina();
         }
-        else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) && is_grounded)
         {
             Walk();
             ReloadStamina();
@@ -109,7 +113,7 @@ public class ThirdPersonMovement : MonoBehaviour
     }
 
     IEnumerator OnJump(InputValue input){
-        if (transform.position.y <= 1.6f)
+        if (is_grounded)
         {
             // set is_jumping to true on animator
             anim.SetBool("is_jumping", true);
@@ -117,6 +121,8 @@ public class ThirdPersonMovement : MonoBehaviour
             yield return new WaitForSeconds(0.7f);
 
             velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
+
+            is_grounded = false;
         }
     }
 
@@ -151,5 +157,14 @@ public class ThirdPersonMovement : MonoBehaviour
     {
         GameManager.gameManager._playerStamina.Stamina -= GameManager.gameManager._playerStamina.UseAmount * Time.deltaTime;
         staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+    }
+
+    // Collision
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag(MESH_TAG))
+        {
+            is_grounded = true;
+        }
     }
 }
