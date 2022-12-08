@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 
 
@@ -25,14 +26,14 @@ public class ThirdPersonMovement : MonoBehaviour
     float turnSmoothVelocity;
     public float turnSmoothTime = 0.1f;
 
-    // Player run & stamina stuff
-    private float runSpeed = 12;
-    private float normalSpeed = 6;
+    // Player run & stamina variables
+    private float runSpeed = 10;
+    private float walkSpeed = 6;
     [SerializeField] private Slider staminaSlider;
-    // sender
-    public delegate void PlayerWalking(bool isWalking);
-    public static event PlayerWalking PlayerActionInfo;
+    
+    // Animator variables
     private Animator anim;
+    private string JUMP_ANIMATION = "is_jumping";
 
     void Start()
     {
@@ -43,6 +44,7 @@ public class ThirdPersonMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         if (transform.position.y <= 1.6 && velocity.y < 0)
         {
             velocity.y = -2f;
@@ -50,39 +52,42 @@ public class ThirdPersonMovement : MonoBehaviour
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
 
-        // run control
+        // Movement Control
         if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && transform.position.y <= 1.6f)
         {
-            speed = runSpeed;
-           
-            GameManager.gameManager._playerStamina.Stamina -= GameManager.gameManager._playerStamina.UseAmount * Time.deltaTime;
-            Debug.Log("Stamina: " + GameManager.gameManager._playerStamina.Stamina);
-            staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+            Run();
+            UseStamina();
+        }
+        else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
+        {
+            Walk();
+            ReloadStamina();
         }
         else
         {
-
-            speed = normalSpeed;
- 
-            if (GameManager.gameManager._playerStamina.Stamina < GameManager.gameManager._playerStamina.MaxStamina)
-            {
-                GameManager.gameManager._playerStamina.Stamina += GameManager.gameManager._playerStamina.ReloadAmount * Time.deltaTime;
-                staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
-            }
-
+            Idle();
+            ReloadStamina();
         }
-    }
 
-    void FixedUpdate(){
-        bool isWalking = MovePlayer();
-        if (PlayerActionInfo != null)
+        // if animation is not jumping, then set anim param to false
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
         {
-            PlayerActionInfo(isWalking);
+            // check if animation is finished
+            if (anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+            {
+                anim.SetBool(JUMP_ANIMATION, false);
+            }
         }
+
     }
 
-    bool MovePlayer(){
-        bool isWalking = false;
+    private void FixedUpdate()
+    {
+        MovePlayer();
+    }
+
+    void MovePlayer(){
+
         Vector3 direction = new Vector3(movementRcvd.x, 0f, movementRcvd.y).normalized;
 
         if(direction.magnitude >= 0.1f)
@@ -93,25 +98,58 @@ public class ThirdPersonMovement : MonoBehaviour
             
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             controller.Move(moveDir.normalized * speed * Time.deltaTime);
-            isWalking = true;
-
+            
         }
 
-        return isWalking;
+        
     }
 
     void OnMove(InputValue input){
         movementRcvd = input.Get<Vector2>();
     }
 
-    void OnJump(InputValue input){
+    IEnumerator OnJump(InputValue input){
         if (transform.position.y <= 1.6f)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
-
             // set is_jumping to true on animator
             anim.SetBool("is_jumping", true);
+
+            yield return new WaitForSeconds(0.7f);
+
+            velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
         }
     }
 
+    // Movement Functions
+    private void Idle()
+    {
+        anim.SetFloat("Speed", 0);
+    }
+
+    private void Walk()
+    {
+        speed = walkSpeed;
+        anim.SetFloat("Speed", 0.5f);
+    }
+
+    private void Run()
+    {
+        speed = runSpeed;
+        anim.SetFloat("Speed", 1);
+    }
+
+    // Stamina Functions
+    private void ReloadStamina()
+    {
+        if (GameManager.gameManager._playerStamina.Stamina < GameManager.gameManager._playerStamina.MaxStamina)
+        {
+            GameManager.gameManager._playerStamina.Stamina += GameManager.gameManager._playerStamina.ReloadAmount * Time.deltaTime;
+            staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+        }
+    }
+    private void UseStamina()
+    {
+        GameManager.gameManager._playerStamina.Stamina -= GameManager.gameManager._playerStamina.UseAmount * Time.deltaTime;
+        staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+    }
 }
