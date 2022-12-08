@@ -23,9 +23,6 @@ public class PlayerBehavior : MonoBehaviour
         {
             PlayerTakeDmg(20);
             Debug.Log(GameManager.gameManager._playerHealth.Health);
-            if(GameManager.gameManager._playerHealth.Health == 0 || GameManager.gameManager._playerHealth.Health < 0  ) {
-                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            }
         }else if(other.tag == "HealthItem") {
             PlayerHeal(30);
             Debug.Log(GameManager.gameManager._playerHealth.Health);
