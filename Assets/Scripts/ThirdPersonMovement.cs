@@ -50,12 +50,20 @@ public class ThirdPersonMovement : MonoBehaviour
     void Update()
     {
 
-        if (transform.position.y <= 1.6 && velocity.y < 0)
+        
+
+    }
+
+    private void FixedUpdate()
+    {
+        if (is_grounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        MovePlayer();
 
         // Movement Control
         if (Input.GetKey(KeyCode.LeftShift) && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))  && GameManager.gameManager._playerStamina.Stamina > 0 && !isStaminaOut && is_grounded)
@@ -98,12 +106,6 @@ public class ThirdPersonMovement : MonoBehaviour
                 anim.SetBool(JUMP_ANIMATION, false);
             }
         }
-
-    }
-
-    private void FixedUpdate()
-    {
-        MovePlayer();
     }
 
     void MovePlayer(){
