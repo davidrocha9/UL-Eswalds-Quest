@@ -11,6 +11,7 @@ using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class ThirdPersonMovement : MonoBehaviour
     public float speed = 6;
     public float gravity = -9.81f;
     public float jumpHeight = 1.5f;
+    private bool isGrounded = false;
     Vector3 velocity;
     Vector2 movementRcvd;
 
@@ -29,21 +31,26 @@ public class ThirdPersonMovement : MonoBehaviour
     // Player run & stamina variables
     private float runSpeed = 10;
     private float walkSpeed = 6;
-    [SerializeField] private Slider staminaSlider;
-    
+    [SerializeField] private UnityEngine.UI.Slider staminaSlider;
+    private bool isStaminaOut = false;
+    Color staminaNoAvailableColor = new Color(0f/255f, 1704f/255f, 209f/255f);
+    Color staminaAvailableColor = new Color(0f / 255f, 194f / 255f, 209f / 255f);
+
     // Animator variables
     private Animator anim;
     private string JUMP_ANIMATION = "is_jumping";
+
+    // Object tags
+    private string MESH_TAG = "Mesh";
 
     void Start()
     {
         // get animator from child
         anim = GetComponentInChildren<Animator>();
     }
-
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
+        MovePlayer();
 
         if (transform.position.y <= 1.6 && velocity.y < 0)
         {
@@ -53,20 +60,38 @@ public class ThirdPersonMovement : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
 
         // Movement Control
-        if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && transform.position.y <= 1.6f)
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) && isGrounded)
         {
-            Run();
-            UseStamina();
-        }
-        else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
-        {
-            Walk();
-            ReloadStamina();
+            if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && !isStaminaOut)
+            {
+                Run();
+                UseStamina();
+            } 
+            else
+            {
+                Walk();
+                if (isStaminaOut)
+                {
+                    FullWaitReloadStamina();
+                }
+                else
+                {
+                    ReloadStamina();
+                }
+            }
+            
         }
         else
         {
             Idle();
-            ReloadStamina();
+            if (isStaminaOut)
+            {
+                FullWaitReloadStamina();
+            }
+            else
+            {
+                ReloadStamina();
+            }
         }
 
         // if animation is not jumping, then set anim param to false
@@ -78,12 +103,6 @@ public class ThirdPersonMovement : MonoBehaviour
                 anim.SetBool(JUMP_ANIMATION, false);
             }
         }
-
-    }
-
-    private void FixedUpdate()
-    {
-        MovePlayer();
     }
 
     void MovePlayer(){
@@ -109,7 +128,7 @@ public class ThirdPersonMovement : MonoBehaviour
     }
 
     IEnumerator OnJump(InputValue input){
-        if (transform.position.y <= 1.6f)
+        if (isGrounded)
         {
             // set is_jumping to true on animator
             anim.SetBool("is_jumping", true);
@@ -117,6 +136,8 @@ public class ThirdPersonMovement : MonoBehaviour
             yield return new WaitForSeconds(0.7f);
 
             velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
+
+            isGrounded = false;
         }
     }
 
@@ -147,9 +168,35 @@ public class ThirdPersonMovement : MonoBehaviour
             staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
         }
     }
+
+    private void FullWaitReloadStamina()
+    {
+        GameManager.gameManager._playerStamina.Stamina += GameManager.gameManager._playerStamina.ReloadAmount * Time.deltaTime;
+        staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+        staminaSlider.gameObject.transform.Find("Fill Area").Find("Fill").GetComponent<UnityEngine.UI.Image>().color = staminaNoAvailableColor;
+        if (GameManager.gameManager._playerStamina.Stamina >= 25)
+        {
+            isStaminaOut = false;
+            staminaSlider.gameObject.transform.Find("Fill Area").Find("Fill").GetComponent<UnityEngine.UI.Image>().color = staminaAvailableColor;
+        }
+    }
     private void UseStamina()
     {
         GameManager.gameManager._playerStamina.Stamina -= GameManager.gameManager._playerStamina.UseAmount * Time.deltaTime;
         staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+
+        if (GameManager.gameManager._playerStamina.Stamina <= 0)
+        {
+            isStaminaOut = true;
+        }
+    }
+
+    // Collision Function
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag(MESH_TAG))
+        {
+            isGrounded = true;
+        }
     }
 }

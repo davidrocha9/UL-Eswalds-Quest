@@ -11,6 +11,7 @@ TagManager:
   - HealthItem
   - StaminaBar
   - Explosion
+  - Mesh
   layers:
   - Default
   - TransparentFX
