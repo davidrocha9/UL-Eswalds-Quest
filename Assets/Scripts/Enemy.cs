@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
+    KillCounter killCounterScript;
+
     [SerializeField]
     private EnemyData data;
     private GameObject player;
@@ -19,6 +21,8 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        killCounterScript = GameObject.Find("KillCounter").GetComponent<KillCounter>();
+
         player = GameObject.FindGameObjectWithTag("Player");
         //BossSlider = GameObject.Find("UI").GetComponent<Slider>();
         GameManager.gameManager._enemyHealth.SetHealth(data.hp);
@@ -29,15 +33,6 @@ public class Enemy : MonoBehaviour
         if(GameManager.gameManager._enemyHealth.Health == 0 || GameManager.gameManager._enemyHealth.Health < 0) {
             Destroy(gameObject);
             BossSlider.gameObject.SetActive(false);
-        }
-        if (other.tag == "FireBall")
-        {
-                EnemyTakeDmg(30);
-                if(GameManager.gameManager._enemyHealth.Health == 0 || GameManager.gameManager._enemyHealth.Health < 0) {
-                    Destroy(this.gameObject);
-                    BossSlider.gameObject.SetActive(false);
-                }
-
         }
         else if (other.tag == "Sword")
         {
@@ -83,6 +78,10 @@ public class Enemy : MonoBehaviour
         }
 
         Chase();
+    }
+    void OnDestroy()
+    {
+        killCounterScript.AddKill();
     }
 
     private void Chase()
