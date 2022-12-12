@@ -12,9 +12,8 @@ public class Enemy : MonoBehaviour
     private bool hitOtherEnemy = false;
     public Slider sliderUI;
     public Slider BossSlider;
-
-
-    private bool tookDmg;
+    private float health = 100.0f;
+    private bool tookDmg = false;
 
     // Start is called before the first frame update
     void Start()
@@ -26,7 +25,7 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(GameManager.gameManager._enemyHealth.Health == 0 || GameManager.gameManager._enemyHealth.Health < 0) {
+        if(health <= 0) {
             Destroy(gameObject);
             BossSlider.gameObject.SetActive(false);
         }
@@ -35,7 +34,7 @@ public class Enemy : MonoBehaviour
                 EnemyTakeDmg(30);
                 if(GameManager.gameManager._enemyHealth.Health == 0 || GameManager.gameManager._enemyHealth.Health < 0) {
                     Destroy(this.gameObject);
-                    BossSlider.gameObject.SetActive(false);
+                    //BossSlider.gameObject.SetActive(false);
                 }
 
         }
@@ -44,7 +43,7 @@ public class Enemy : MonoBehaviour
                 EnemyTakeDmg(40);
                 if(GameManager.gameManager._enemyHealth.Health == 0 || GameManager.gameManager._enemyHealth.Health < 0) {
                     Destroy(this.gameObject);
-                    BossSlider.gameObject.SetActive(false);
+                    //BossSlider.gameObject.SetActive(false);
                 }
 
         }
@@ -63,7 +62,7 @@ public class Enemy : MonoBehaviour
                 }
             } else {
                 sliderUI.value = sliderUI.value - 0.01f;
-                if (sliderUI.value * 100.0f <= GameManager.gameManager._enemyHealth.Health)
+                if (sliderUI.value * 100.0f <= health)
                 {
                     tookDmg = false;
                 }
@@ -71,6 +70,8 @@ public class Enemy : MonoBehaviour
 
         }
 
+        // make sliderUI look at camera
+        sliderUI.transform.LookAt(Camera.main.transform);
     }
 
 
@@ -99,8 +100,17 @@ public class Enemy : MonoBehaviour
 
     public void EnemyTakeDmg(int dmg)
     {
-        GameManager.gameManager._enemyHealth.DmgUnit(dmg);
-        tookDmg = true;
+        if (tookDmg)
+            return; 
+
+        health -= 40.0f;
+
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
+        else
+            tookDmg = true;
     }
 
 }
