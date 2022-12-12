@@ -16,7 +16,9 @@ public class PauseMenu : MonoBehaviour
             isPaused = !isPaused;
         }
 
-        if(GameManager.gameManager._playerHealth.Health == 0 || GameManager.gameManager._playerHealth.Health < 0 ) {
+        Debug.Log(GameManager.gameManager._playerHealth.Health);
+        
+        if(GameManager.gameManager._playerHealth.Health <= 0 ) {
             isPaused = true;
             StatsUI.SetActive(false);
             DeathMenuUI.SetActive(true);

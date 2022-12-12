@@ -20,6 +20,7 @@ public class ThirdPersonMovement : MonoBehaviour
     public float speed = 6;
     public float gravity = -9.81f;
     public float jumpHeight = 1.5f;
+    private bool is_grounded = false;
     Vector3 velocity;
     Vector2 movementRcvd;
 
@@ -30,10 +31,14 @@ public class ThirdPersonMovement : MonoBehaviour
     private float runSpeed = 10;
     private float walkSpeed = 6;
     [SerializeField] private Slider staminaSlider;
+    private bool isStaminaOut = false;
     
     // Animator variables
     private Animator anim;
     private string JUMP_ANIMATION = "is_jumping";
+
+    // Object tags
+    private string MESH_TAG = "Mesh";
 
     void Start()
     {
@@ -45,28 +50,51 @@ public class ThirdPersonMovement : MonoBehaviour
     void Update()
     {
 
-        if (transform.position.y <= 1.6 && velocity.y < 0)
+        
+
+    }
+
+    private void FixedUpdate()
+    {
+        if (is_grounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
 
+        MovePlayer();
+
         // Movement Control
-        if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && transform.position.y <= 1.6f)
+        if (Input.GetKey(KeyCode.LeftShift) && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))  && GameManager.gameManager._playerStamina.Stamina > 0 && !isStaminaOut && is_grounded)
         {
             Run();
             UseStamina();
         }
-        else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) && is_grounded)
         {
             Walk();
-            ReloadStamina();
+            if (isStaminaOut)
+            {
+                FullWaitReloadStamina();
+            } 
+            else
+            {
+                ReloadStamina();
+            }
+            
         }
         else
         {
             Idle();
-            ReloadStamina();
+            if (isStaminaOut)
+            {
+                FullWaitReloadStamina();
+            }
+            else
+            {
+                ReloadStamina();
+            }
         }
 
         // if animation is not jumping, then set anim param to false
@@ -78,12 +106,6 @@ public class ThirdPersonMovement : MonoBehaviour
                 anim.SetBool(JUMP_ANIMATION, false);
             }
         }
-
-    }
-
-    private void FixedUpdate()
-    {
-        MovePlayer();
     }
 
     void MovePlayer(){
@@ -109,7 +131,7 @@ public class ThirdPersonMovement : MonoBehaviour
     }
 
     IEnumerator OnJump(InputValue input){
-        if (transform.position.y <= 1.6f)
+        if (is_grounded)
         {
             // set is_jumping to true on animator
             anim.SetBool("is_jumping", true);
@@ -117,6 +139,8 @@ public class ThirdPersonMovement : MonoBehaviour
             yield return new WaitForSeconds(0.7f);
 
             velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
+
+            is_grounded = false;
         }
     }
 
@@ -147,9 +171,34 @@ public class ThirdPersonMovement : MonoBehaviour
             staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
         }
     }
+
+    private void FullWaitReloadStamina()
+    {
+        GameManager.gameManager._playerStamina.Stamina += GameManager.gameManager._playerStamina.ReloadAmount * Time.deltaTime;
+        staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+        if (GameManager.gameManager._playerStamina.Stamina >= 25)
+        {
+            isStaminaOut = false;
+        }
+    }
     private void UseStamina()
     {
         GameManager.gameManager._playerStamina.Stamina -= GameManager.gameManager._playerStamina.UseAmount * Time.deltaTime;
         staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+
+        if (GameManager.gameManager._playerStamina.Stamina <= 0)
+        {
+            isStaminaOut = true;
+        }
     }
+
+    // Collision
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag(MESH_TAG))
+        {
+            is_grounded = true;
+        }
+    }
+
 }

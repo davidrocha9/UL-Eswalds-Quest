@@ -19,13 +19,9 @@ public class PlayerBehavior : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "EnemyWeapon")
-        {
-            PlayerTakeDmg(20);
-            Debug.Log(GameManager.gameManager._playerHealth.Health);
-        }else if(other.tag == "HealthItem") {
+        if(other.tag == "HealthItem") {
             PlayerHeal(30);
-            Debug.Log(GameManager.gameManager._playerHealth.Health);
+            //Debug.Log(GameManager.gameManager._playerHealth.Health);
         }
     }
 
@@ -39,8 +35,8 @@ public class PlayerBehavior : MonoBehaviour
         if (tookDmg)
         {
             healthBar.value = healthBar.value - 0.01f;
-            Debug.Log(healthBar.value);
-            Debug.Log(GameManager.gameManager._playerHealth.Health);
+            //Debug.Log(healthBar.value);
+            //Debug.Log(GameManager.gameManager._playerHealth.Health);
             if (healthBar.value * 100.0f <= GameManager.gameManager._playerHealth.Health)
             {
                 tookDmg = false;
@@ -50,8 +46,8 @@ public class PlayerBehavior : MonoBehaviour
 
         if(healed) {
             healthBar.value = healthBar.value + 0.01f;
-            Debug.Log(healthBar.value);
-            Debug.Log(GameManager.gameManager._playerHealth.Health);
+            //Debug.Log(healthBar.value);
+            //Debug.Log(GameManager.gameManager._playerHealth.Health);
             if (healthBar.value * 100.0f >= GameManager.gameManager._playerHealth.Health)
             {
                 healed = false;
@@ -64,7 +60,7 @@ public class PlayerBehavior : MonoBehaviour
     private void PlayerTakeDmg(int dmg)
     {
         GameManager.gameManager._playerHealth.DmgUnit(dmg);
-        Debug.Log(GameManager.gameManager._playerHealth.Health);
+        //Debug.Log(GameManager.gameManager._playerHealth.Health);
         tookDmg = true;
     }
 
