@@ -33,7 +33,7 @@ public class ThirdPersonMovement : MonoBehaviour
     private float walkSpeed = 6;
     [SerializeField] private UnityEngine.UI.Slider staminaSlider;
     private bool isStaminaOut = false;
-    Color staminaNoAvailableColor = new Color(0f/255f, 1704f/255f, 209f/255f);
+    Color staminaNoAvailableColor = new Color(192f/255f, 192f/255f, 192f/255f);
     Color staminaAvailableColor = new Color(0f / 255f, 194f / 255f, 209f / 255f);
 
     // Animator variables
