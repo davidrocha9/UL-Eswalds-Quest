@@ -11,6 +11,7 @@ using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class ThirdPersonMovement : MonoBehaviour
     public float speed = 6;
     public float gravity = -9.81f;
     public float jumpHeight = 1.5f;
-    private bool is_grounded = false;
+    private bool isGrounded = false;
     Vector3 velocity;
     Vector2 movementRcvd;
 
@@ -30,9 +31,11 @@ public class ThirdPersonMovement : MonoBehaviour
     // Player run & stamina variables
     private float runSpeed = 10;
     private float walkSpeed = 6;
-    [SerializeField] private Slider staminaSlider;
+    [SerializeField] private UnityEngine.UI.Slider staminaSlider;
     private bool isStaminaOut = false;
-    
+    Color staminaNoAvailableColor = new Color(192f/255f, 192f/255f, 192f/255f);
+    Color staminaAvailableColor = new Color(0f / 255f, 194f / 255f, 209f / 255f);
+
     // Animator variables
     private Animator anim;
     private string JUMP_ANIMATION = "is_jumping";
@@ -46,17 +49,9 @@ public class ThirdPersonMovement : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-        
-
-    }
-
     private void FixedUpdate()
     {
-        if (is_grounded && velocity.y < 0)
+        if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
@@ -66,21 +61,24 @@ public class ThirdPersonMovement : MonoBehaviour
         MovePlayer();
 
         // Movement Control
-        if (Input.GetKey(KeyCode.LeftShift) && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))  && GameManager.gameManager._playerStamina.Stamina > 0 && !isStaminaOut && is_grounded)
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) && isGrounded)
         {
-            Run();
-            UseStamina();
-        }
-        else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) && is_grounded)
-        {
-            Walk();
-            if (isStaminaOut)
+            if (Input.GetKey(KeyCode.LeftShift) && GameManager.gameManager._playerStamina.Stamina > 0 && !isStaminaOut)
             {
-                FullWaitReloadStamina();
+                Run();
+                UseStamina();
             } 
             else
             {
-                ReloadStamina();
+                Walk();
+                if (isStaminaOut)
+                {
+                    FullWaitReloadStamina();
+                }
+                else
+                {
+                    ReloadStamina();
+                }
             }
             
         }
@@ -131,7 +129,7 @@ public class ThirdPersonMovement : MonoBehaviour
     }
 
     IEnumerator OnJump(InputValue input){
-        if (is_grounded)
+        if (isGrounded)
         {
             // set is_jumping to true on animator
             anim.SetBool("is_jumping", true);
@@ -140,7 +138,7 @@ public class ThirdPersonMovement : MonoBehaviour
 
             velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
 
-            is_grounded = false;
+            isGrounded = false;
         }
     }
 
@@ -176,9 +174,11 @@ public class ThirdPersonMovement : MonoBehaviour
     {
         GameManager.gameManager._playerStamina.Stamina += GameManager.gameManager._playerStamina.ReloadAmount * Time.deltaTime;
         staminaSlider.value = GameManager.gameManager._playerStamina.Stamina / 100.0f;
+        staminaSlider.gameObject.transform.Find("Fill Area").Find("Fill").GetComponent<UnityEngine.UI.Image>().color = staminaNoAvailableColor;
         if (GameManager.gameManager._playerStamina.Stamina >= 25)
         {
             isStaminaOut = false;
+            staminaSlider.gameObject.transform.Find("Fill Area").Find("Fill").GetComponent<UnityEngine.UI.Image>().color = staminaAvailableColor;
         }
     }
     private void UseStamina()
@@ -197,7 +197,7 @@ public class ThirdPersonMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag(MESH_TAG))
         {
-            is_grounded = true;
+            isGrounded = true;
         }
     }
 
