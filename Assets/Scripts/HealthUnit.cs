@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class UnitHealth
 {
-    int _currentHealth;
+    public int _currentHealth;
     int _currentMaxHealth;
 
     public int Health
@@ -42,6 +42,7 @@ public class UnitHealth
 
     public void DmgUnit(int dmgAmount)
     {
+        Debug.Log("Current Health: " + _currentHealth);
         if(_currentHealth > 0)
         {
             _currentHealth -= dmgAmount;

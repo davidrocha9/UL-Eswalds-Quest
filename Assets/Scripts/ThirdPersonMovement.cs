@@ -48,16 +48,17 @@ public class ThirdPersonMovement : MonoBehaviour
         // get animator from child
         anim = GetComponentInChildren<Animator>();
     }
+
     private void FixedUpdate()
     {
-        MovePlayer();
-
-        if (transform.position.y <= 1.6 && velocity.y < 0)
+        if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        MovePlayer();
 
         // Movement Control
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) && isGrounded)
@@ -191,7 +192,7 @@ public class ThirdPersonMovement : MonoBehaviour
         }
     }
 
-    // Collision Function
+    // Collision
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag(MESH_TAG))
@@ -199,4 +200,5 @@ public class ThirdPersonMovement : MonoBehaviour
             isGrounded = true;
         }
     }
+
 }
